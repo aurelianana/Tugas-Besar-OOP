@@ -152,3 +152,163 @@ public class Game extends javax.swing.JFrame {
         );
         pack();
     }
+
+private void jFlappyKeyReleased(java.awt.event.KeyEvent evt) {
+        if (start) {
+            if (evt.getExtendedKeyCode() == 32) {
+                this.mvnt_flappy.setSpeed(increaseSpeed());
+                this.mvnt_flappy.setJump(true);
+                jFlappy.requestFocus(true);
+                Sound.saltar();
+            }
+            PipeTouched();
+        }
+    }
+
+    private void panelImage1MousePressed(java.awt.event.MouseEvent evt) {
+        if (start) {
+            this.mvnt_flappy.setSpeed(increaseSpeed());
+            this.mvnt_flappy.setJump(true);
+            jFlappy.requestFocus(true);
+            Sound.saltar();
+        }
+    }
+
+    private int increaseSpeed() {
+        int points = Integer.parseInt(jScore.getText());
+        if (points == 150 || points == 300) {
+            speed = speed - 1;
+        }
+        return speed;
+    }
+
+    private void EventosExternos() {
+        login.jButton1.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+    }
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+        name = this.login.jTextField1.getText();
+        this.panel1.setVisible(false);
+        Start();
+        hideObjects(true);
+    }
+
+    public void Start() {
+        mvnt_pipe = new Move_Pipe();
+        mvnt_flappy = new Move_Flappy(this);
+        mvnt_pipe.start();
+        mvnt_flappy.start();
+        start = true;
+        jFlappy.requestFocus();
+        this.setTitle("FLAPPY SLIME - " + name);
+    }
+
+    public void PipeTouched() {
+        Point loclz_Flappy = jFlappy.getLocation();
+        Point loclz_Tubo1 = jPipe_up1.getLocation();
+        Point loclz_Tubo2 = jPipe_up2.getLocation();
+        Point loclz_Tubo3 = jPipe_bottom1.getLocation();
+        Point loclz_Tubo4 = jPipe_bottom2.getLocation();
+        if (loclz_Flappy.x > (loclz_Tubo1.x - 32) && loclz_Flappy.x < ((loclz_Tubo1.x - 32) + 82) && loclz_Flappy.y < (loclz_Tubo1.y + 318)) {
+            Sound.choque();
+            this.mvnt_pipe.stop();
+            this.mvnt_flappy.setJump(false);
+            start = false;
+            Sound.caida();
+        } else if (loclz_Flappy.x > (loclz_Tubo2.x - 32) && loclz_Flappy.x < ((loclz_Tubo2.x - 32) + 82) && loclz_Flappy.y < (loclz_Tubo2.y + 318)) {
+            Sound.choque();
+            this.mvnt_pipe.stop();
+            this.mvnt_flappy.setJump(false);
+            start = false;
+            Sound.caida();
+        } else if (loclz_Flappy.x > (loclz_Tubo3.x - 32) && loclz_Flappy.x < ((loclz_Tubo3.x - 32) + 82) && loclz_Flappy.y > (loclz_Tubo3.y - 22)) {
+            Sound.choque();
+            this.mvnt_pipe.stop();
+            this.mvnt_flappy.setJump(false);
+            start = false;
+            Sound.caida();
+        } else if (loclz_Flappy.x > (loclz_Tubo4.x - 32) && loclz_Flappy.x < ((loclz_Tubo4.x - 32) + 82) && loclz_Flappy.y > (loclz_Tubo4.y - 22)) {
+            Sound.choque();
+            this.mvnt_pipe.stop();
+            this.mvnt_flappy.setJump(false);
+            start = false;
+            Sound.caida();
+        }
+    }
+
+    private void hideObjects(boolean accion) {
+        jFlappy.setVisible(accion);
+        jPipe_bottom1.setVisible(accion);
+        jPipe_bottom2.setVisible(accion);
+        jPipe_up1.setVisible(accion);
+        jPipe_up2.setVisible(accion);
+        jScore.setVisible(accion);
+    }
+
+    public synchronized void TouchValidation() {
+        int y = jFlappy.getLocation().y;
+        if (y == 448) {
+            if (Sound.terminochoque) {
+                Sound.choque();
+            }
+            GameOver gameover = new GameOver(this, true);
+            try {
+                Thread hilo = new Thread() {
+                    @Override
+                    public void run() {
+                        mvnt_pipe.stop();
+                        Move_Flappy.stop = true;
+                        stop();
+                    }
+                };
+                hilo.start();
+            } catch (Exception e) {
+            }
+            gameover.setVisible(true);
+        }
+    }
+
+    public void showScore() {
+        Sound.terminocaida = true;
+        Sound.terminochoque = true;
+        hideObjects(false);
+        panel2 = new JPanel();
+        panel2.setBounds(0, 0, this.getWidth(), 550);
+        panel2.add(skor);
+        skor.setBounds(0, 0, panel2.getWidth(), panel2.getHeight());
+        panelImage1.add(panel2);
+        panel2.setBackground(new Color(187, 214, 207));
+        skor.setVisible(true);
+        skor.show();
+        panel2.setVisible(true);
+    }
+
+    public void StartNew() {
+        jFlappy.setLocation(posicionflappy);
+        jScore.setText("0");
+        this.panel2.setVisible(false);
+        Start();
+        hideObjects(true);
+        skor = new Score(this);
+    }
+
+    private void showLogin() {
+        panel1 = new JPanel();
+        panel1.setBounds(10, 200, 380, 140);
+        panel1.add(login);
+        login.setBounds(0, 0, panel1.getWidth(), panel1.getHeight());
+        panelImage1.add(panel1);
+        panel1.setBackground(new Color(255, 255, 153));
+        login.setVisible(true);
+        panel1.setVisible(true);
+    }
+
+    void StartLogin() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+}
