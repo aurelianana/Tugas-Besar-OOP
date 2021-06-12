@@ -1,0 +1,155 @@
+package Classes;
+
+import Interface.Game;
+
+
+public class Move_Flappy extends Thread {
+
+    private int speed;
+    private boolean jump;
+    private boolean stopJump1 = false;
+    private boolean stopJump2 = true;
+    private boolean jumping = false;
+    private final Game parent;
+    public static boolean stop;
+
+    public Move_Flappy(Game parent) {
+        this.speed = 10;
+        this.parent = parent;
+    }
+
+    @Override
+    public void run() {
+        int varA = 1;
+        stop = false;
+        while (true) {
+            if (stop) {
+                break;
+            }
+            int x = Game.jFlappy.getLocation().x;
+            if (!isJump()) {
+                int y = Game.jFlappy.getLocation().y;
+                try {
+                    Thread.sleep(getSpeed());
+                    Game.jFlappy.setLocation(x, (y + 1));
+                    if (speed > 3) {
+                        if (varA % 15 == 0) {
+                            speed = speed - 1;
+                        }
+                        varA = varA + 1;
+                    }
+                    parent.PipeTouched();
+                } catch (InterruptedException e) {
+                    System.out.println("There is an errror! " + e);
+                }
+            } else {
+                if (!jumping) {
+                    setStopJump1(false);
+                    setStopJump2(true);
+                    jumping = true;
+                    jump1();
+                } else {
+                    setStopJump1(true);
+                    setStopJump2(false);
+                    jumping = false;
+                    jump2();
+                }
+            }
+            this.parent.TouchValidation();
+        }
+    }
+
+    private void jump1() {
+        int jump_tempo = 1;
+        while (true) {
+            int y = Game.jFlappy.getLocation().y;
+            int x = Game.jFlappy.getLocation().x;
+            try {
+                Thread.sleep(getSpeed());
+                if (!isStopJump1()) {
+                    jump_tempo = jump_tempo + 1;
+                    if (jump_tempo <= 60) {
+                        Game.jFlappy.setLocation(x, (y - 1));
+                        if (jump_tempo % 20 == 0) {
+                            speed = speed - 1;
+                        }
+                    } else if (jump_tempo >= 70) {
+                        setJump(false);
+                        setSpeed(7);
+                        break;
+                    }
+                    parent.PipeTouched();
+                } else {
+                    break;
+                }
+            } catch (InterruptedException e) {
+                System.out.println("There is an error! " + e);
+            }
+        }
+    }
+
+    private void jump2() {
+        int jump_tempo = 1;
+        while (true) {
+            int y = Game.jFlappy.getLocation().y;
+            int x = Game.jFlappy.getLocation().x;
+            try {
+                Thread.sleep(getSpeed());
+                if (!isStopJump2()) {
+                    jump_tempo = jump_tempo + 1;
+                    if (jump_tempo <= 60) {
+                        Game.jFlappy.setLocation(x, (y - 1));
+                        if (jump_tempo % 20 == 0) {
+                            speed = speed - 1;
+                        }
+                    } else if (jump_tempo >= 70) {
+                        setJump(false);
+                        setSpeed(7);
+                        break;
+                    }
+                    parent.PipeTouched();
+                } else {
+                    break;
+                }
+            } catch (InterruptedException e) {
+                System.out.println("There is an error! " + e);
+            }
+        }
+    }
+
+    public boolean isStopJump1() {
+        return stopJump1;
+    }
+
+    public void setStopJump1(boolean stopJump1) {
+        this.stopJump1 = stopJump1;
+    }
+
+    public boolean isStopJump2() {
+        return stopJump2;
+    }
+
+    public void setStopJump2(boolean stopJump2) {
+        this.stopJump2 = stopJump2;
+    }
+
+    public boolean isJump() {
+        return jump;
+    }
+
+    public void setJump(boolean Jump) {
+        this.jump = Jump;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int Speed) {
+        this.speed = Speed;
+    }
+
+    public boolean isStop() {
+        return stop;
+    }
+}
