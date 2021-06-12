@@ -1,0 +1,83 @@
+package Classes;
+
+import Interface.Game;
+import sounds.Sound;
+
+
+public class Move_Pipe extends Thread {
+
+    static int speed;
+    private static int points;
+
+    public Move_Pipe() {
+        speed = 7;
+        points = 0;
+        hidePipe();
+    }
+
+    private static synchronized void poinScore() {
+        int pipe1 = Game.jPipe_up1.getLocation().x;
+        int pipe2 = Game.jPipe_up2.getLocation().x;
+        if (pipe1 == 90) {
+            Sound.points();
+            points = points + 1;
+            Game.jScore.setText(points + "");
+            if (points == 30 || points == 50 || points == 130 || points == 160 || points == 200 || points == 300) {
+                speed = speed - 1;
+            }
+        } else if (pipe2 == 90) {
+            Sound.points();
+            points = points + 1;
+            Game.jScore.setText(points + "");
+            if (points == 30 || points == 50 || points == 130 || points == 160 || points == 200 || points == 300) {
+                speed = speed - 1;
+            }
+        }
+    }
+
+    @Override
+    public void run() {
+        int posicion1 = generarPosicionAleatoria();
+        int posicion2 = generarPosicionAleatoria();
+        int x1 = Game.jPipe_up1.getLocation().x;
+        int x2 = Game.jPipe_up2.getLocation().x;
+        while (true) {
+            try {
+                Thread.sleep(getSpeed());
+                x1--;
+                x2--;
+                Game.jPipe_up1.setLocation(x1, posicion1);
+                Game.jPipe_bottom1.setLocation(x1, (posicion1 + 325));
+                Game.jPipe_up2.setLocation(x2, posicion2);
+                Game.jPipe_bottom2.setLocation(x2, (posicion2 + 325));
+                if (x1 <= -51) {
+                    posicion1 = generarPosicionAleatoria();
+                    x1 = 325;
+                }
+                if (x2 <= -51) {
+                    posicion2 = generarPosicionAleatoria();
+                    x2 = 325;
+                }
+                poinScore();
+            } catch (InterruptedException ex) {
+                System.out.println("Problem in moving pipes! " + ex);
+            }
+        }
+    }
+
+    private void hidePipe() {
+        Game.jPipe_up1.setLocation(460, 500);
+        Game.jPipe_bottom1.setLocation(460, 1000);
+        Game.jPipe_up2.setLocation(700, 500);
+        Game.jPipe_bottom2.setLocation(700, 1000);
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    private int generarPosicionAleatoria() {
+        int number = (int) (Math.random() * (0 - (-200)) + (-200));
+        return number;
+    }
+}
